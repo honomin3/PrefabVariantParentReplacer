@@ -1,0 +1,15 @@
+{
+  "name": "dev.honomin.prefab-variant-parent-replacer",
+  "displayName": "Prefab Variant Parent Replacer",
+  "version": "1.0.0",
+  "unity": "2022.3",
+  "description": "Unity editor tool for replacing Prefab Variant parents with FileID mapping and external reference repair.",
+  "author": {
+    "name": "honomin3"
+  },
+  "license": "MIT",
+  "vpmDependencies": {},
+  "legacyFiles": {
+    "Assets/honomin3/PrefabVariantParentReplacer/Editor/PrefabVariantParentReplacer.cs": ""
+  }
+}

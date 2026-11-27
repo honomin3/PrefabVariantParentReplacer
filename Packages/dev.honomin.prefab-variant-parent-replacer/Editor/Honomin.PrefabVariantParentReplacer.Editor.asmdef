@@ -1,0 +1,5 @@
+{
+  "name": "Honomin.PrefabVariantParentReplacer.Editor",
+  "includePlatforms": ["Editor"],
+  "autoReferenced": true
+}

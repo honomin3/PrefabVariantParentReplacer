@@ -1,0 +1,33 @@
+name: Build packages
+
+on:
+  push:
+    branches: [master]
+    tags: ['prefab-variant-parent-replacer-v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build VPM and UPM archives
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            python3 scripts/build_package.py --tag "$GITHUB_REF_NAME"
+          else
+            python3 scripts/build_package.py
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: prefab-variant-parent-replacer-packages
+          path: dist/*
+          if-no-files-found: error
