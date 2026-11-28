@@ -1,0 +1,24 @@
+{
+    "passed": true,
+    "unityVersion": "2022.3.22f1",
+    "checks": [
+        "Disposable validation project selected",
+        "Fixture folder does not already exist",
+        "Package Editor assembly loaded",
+        "Fixture is a Prefab Variant",
+        "Analysis identifies the variant and skips the unrelated prefab",
+        "Rebase succeeds and skips the unrelated prefab",
+        "Variant parent changed to the new prefab",
+        "Variant GUID preserved",
+        "Transform override preserved",
+        "Component override preserved",
+        "New parent values inherited",
+        "Prefab backup created",
+        "Parent assets preserved",
+        "Skipped prefab preserved",
+        "ScriptableObject references resolve after rebase",
+        "Scene reference resolves after rebase",
+        "Tool menu opens"
+    ],
+    "error": ""
+}

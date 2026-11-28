@@ -1,5 +1,9 @@
 # Prefab Variant Parent Replacer
 
+Prefab Variantの親（Variant Parent）を一括で差し替えるUnityエディタ拡張です。新旧の親Prefab間でFileIDを照合し、差し替え後のシーンや他アセットからの外部参照も修復します。
+
+作者：**honomin3** ／ 配布元：**honomin3's Packages** ／ パッケージID：`dev.honomin.prefab-variant-parent-replacer`
+
 > [!CAUTION]
 > **免責事項 (Disclaimer) - ご利用前に必ずお読みください**
 > 本ツールは非破壊ツールではなく、**Prefabの内部データ（YAML）を直接書き換える「破壊的変更」を行うツール**です。
@@ -9,66 +13,100 @@
 >
 > 上記に同意いただける方のみ、ご自身の責任において自由にご利用・改造ください。利用前に必ずプロジェクトのバックアップを取得することを強く推奨します。
 
----
+## 動作環境
 
-「**Prefab Variant Parent Replacer**」は、Prefab Variant の親 (Variant Parent) をテキストベースで安全かつ一括で差し替えるための Unity エディタ拡張ツールです。
+- パッケージの最小Unityバージョン：**2022.3**。
+- Project Settingsの **Editor → Asset Serialization → Mode** を **Force Text** に設定したプロジェクト。
+- Unity Editor専用です。VRChat SDK・Modular Avatar（MA）・NDMFへの依存はありません。
 
-## 想定用途
-アバター(A)から改変ベース(B)を作り、そこから衣装差分(C)を作った後、改変ベースを作り直した(D)際に、衣装差分(C)の親をBからDに差し替える用途に最適です。
+VRChat向けに使用する場合は、[VRChat公式の対応Unityバージョン](https://creators.vrchat.com/sdk/upgrade/current-unity-version/)も確認してください。すべてのUnityバージョン・アバター・外部ツールとの組み合わせを検証済みとはしていません。
 
-## ツールの配置 (インストール)
-本スクリプトをプロジェクト内の `Editor` フォルダ内に配置してください。
-（例: `Assets/honomin3/PrefabVariantParentReplacer/Editor/PrefabVariantParentReplacer.cs`）
-※ `Editor` という名前のフォルダ内、またはEditor用のasmdefが設定されたフォルダ内であればどこでも正常に動作します。
+## 導入方法
 
-## 使い方
+### VCCから導入する
 
-> [!TIP]
-> 繰り返しになりますが、作業前に念のためプロジェクトのバックアップ（または対象Prefabのバックアップ）を取っておくことをお勧めします。
+既存のプロジェクトは変更前にバックアップを作成し、導入先のUnityを閉じてから進めてください。従来のスクリプト版を使用している場合は、後述の移行手順も確認してください。
 
-1.  **ツールの起動**
-    Unityエディタ上部のメニューから `Tools > honomin3 > Prefab Variant Parent Replacer`（日本語UIでは `ツール > honomin3 > Prefab Variant Parent Replacer`）をクリックしてウィンドウを開きます。
+1. VRChat Creator Companion（VCC）で導入先のプロジェクトを用意します。
+2. VCCの **Settings → Packages → Add Repository** を開き、次のURLを入力して **Add** を押します。
 
-2.  **Variant Parentの指定**
-    *   **旧Variant Parent**: これまで親だった古いVariant ParentのPrefabをドラッグ＆ドロップします。
-    *   **新Variant Parent**: 新しく親にしたい新しいVariant ParentのPrefabをドラッグ＆ドロップします。
+   ```text
+   https://raw.githubusercontent.com/honomin3/Packages/main/index.json
+   ```
 
-3.  **書き換え対象の指定**
-    *   **対象Prefab（複数可）**: 親を差し替えたい衣装差分などのPrefab Variantを登録します。スクロール可能なリストになっており、複数の一括処理（バッチ処理）が可能です。
+3. 配布元が **honomin3's Packages**、パッケージが **Prefab Variant Parent Replacer** であることを確認し、**I Understand, Add Repository** を押します。配布元を登録済みの場合は再登録不要です。
+4. **Projects** から導入先の **Manage Project** を開きます。**Prefab Variant Parent Replacer** の右側の **＋**、または導入したいバージョンを選択してインストールします。
+5. Unityを開き、読み込み・コンパイルが完了するまで待ちます。Projectウィンドウの **Packages** にPrefab Variant Parent Replacerが表示されれば導入完了です。
 
-4.  **オプション設定・事前解析**
-    *   **自動照合フォールバック**: 階層パス一致に加えて、「Humanoidボーン一致」「一意なGameObject名一致」のフォールバック照合オプションを利用できます。
-    *   **1. 事前解析（未解決FileIDの確認・手動マッピング準備）**: 実行前に事前解析を行うことで、新旧の親間で自動照合できなかった未解決FileIDを事前確認し、手動で対応オブジェクトを指定できます。
-    *   **`.bak` バックアップの作成**: 書き換え前に対象ファイルの `.bak` バックアップを作成するオプションを利用できます。
+一覧に表示されない場合は、VCCのリポジトリ一覧や **Selected Repos** で **honomin3's Packages** が有効か確認してください。画面やボタン名は利用中の版で異なる場合があります。[配布元の追加](https://vcc.docs.vrchat.com/guides/community-repositories/)と[プロジェクトへの追加](https://vcc.docs.vrchat.com/vpm/)はVCC公式説明も参照してください。
 
-5.  **実行**
-    *   ウィンドウ下部の **`Variant Parentを差し替える（GUIDとFileIDを自動修正）`** ボタンをクリックします。
+### ALCOMを使う場合
 
----
+ALCOMでも同じVPMリポジトリURLを使えます。**パッケージ管理 → VPMリポジトリを追加** から上記のURLを登録し、導入先プロジェクトの管理画面で **Prefab Variant Parent Replacer** を追加して変更を適用します。MA／NDMFを追加する必要はありません。
 
-## 主な機能と仕様
+### 配布ファイルを直接使う場合
 
-### 1. FileID Missing の自動解決（スマートリプレイス）
-古い親から新しい親へと乗り換える際、それぞれの親で独自に追加されたオブジェクト（服やボーンなど）は内部的なID（FileID）がズレてしまい、単純なGUID置換だけでは `Missing` が発生するケースがあります。
+[GitHub Releases](https://github.com/honomin3/PrefabVariantParentReplacer/releases)から対象バージョンのファイルを取得します。通常の導入・更新にはVCC／ALCOMを使用し、同じパッケージを複数の方法で重ねて導入しないでください。
 
-当ツールは実行時に**「旧Variant Parent」と「新Variant Parent」の階層構造やコンポーネントをスキャンして自動で「FileIDの変換表」を作成**し、GUIDの差し替えと同時に、ズレてしまったFileIDも正しいものへと自動修正します。
+- **UPM用 `.tgz`**：Unityの **Window → Package Manager → ＋ → Add package from tarball…** で `.tgz` を選択します。展開は不要です。
+- **VPM用 `.zip`**：ZIPを展開し、`package.json` が入ったフォルダーをVCCの **Settings → Packages → User Packages → Add** から登録します。その後、導入先プロジェクトのパッケージ一覧から追加します。ZIPをAssetsへそのまま入れる方式ではありません。[User Packagesの公式説明](https://vcc.docs.vrchat.com/vpm/packages/)も参照してください。
 
-親Prefab間のFileID自動照合では、階層パス一致に加えて、フォールバック照合オプションとして**「Humanoidボーン一致」**および**「一意なGameObject名一致」**に対応しています。また、**「1. 事前解析（未解決FileIDの確認・手動マッピング準備）」**により、新旧の親間で自動照合できなかった未解決FileIDを事前に確認し、手動で対応オブジェクトを指定することも可能です。
+ソースから確認する場合は、このリポジトリを取得し、`Packages/dev.honomin.prefab-variant-parent-replacer` をUser Packagesに登録できます。UPMでは **Add package from disk…** で同フォルダーの `package.json` を指定します。
+
+### 従来のAssets配置から移行する
+
+1. プロジェクトをバックアップし、Unityを閉じます。
+2. Assets内に手動配置した `PrefabVariantParentReplacer.cs` を取り除きます。別のEditorフォルダーへ移動・複製している場合も確認してください。バックアップはプロジェクトのAssets外へ保管します。
+3. VCC／ALCOM、または配布ファイルから本パッケージを導入します。
+4. Unityを開き、同じクラスの重複定義エラーが出ないことと、従来のメニューからツールを開けることを確認します。
+
+VPM版は、従来の標準配置 `Assets/honomin3/PrefabVariantParentReplacer/Editor/PrefabVariantParentReplacer.cs` を `legacyFiles` に登録しています。VPMによる移行時はこのファイルが削除対象になります。別の場所へ配置したコピーや、UPMによる導入では手動で取り除いてください。既存のPrefabやシーンを移動する必要はありません。
+
+## 基本的な使い方
+
+アバター（A）から改変ベース（B）を作り、そこから衣装差分（C）を作った後、改変ベースを作り直した（D）際に、衣装差分（C）の親をBからDへ差し替える用途を想定しています。
+
+実行前にプロジェクトまたは対象Prefabと参照元アセットのバックアップを取得してください。
+
+1. Unity上部の **Tools → honomin3 → Prefab Variant Parent Replacer** からウィンドウを開きます。
+2. **旧Variant Parent** に従来の親Prefab、**新Variant Parent** に差し替え先の親Prefabを指定します。
+3. **対象Prefab（複数可）** に、親を差し替えたいPrefab Variantを登録します。
+4. 必要に応じて **Humanoidボーンによるフォールバック照合**、**一意なGameObject名によるフォールバック照合**、**シーン・他アセットからの外部参照切れを自動修復** を設定します。
+5. **1. 事前解析（未解決FileIDの確認・手動マッピング準備）** を実行し、自動照合できなかった項目を確認します。必要な項目に手動で対応オブジェクトを指定します。
+6. 必要に応じて **書き換え前に .bak バックアップを作成** を有効にします。このオプションの初期値はオフです。
+7. **Variant Parentを差し替える（GUIDとFileIDを自動修正）** を実行します。
+8. 差し替えたPrefabとシーンを開き、Missingや外部参照、アバターの状態を確認します。
+
+## 主な機能と制限
+
+### FileIDの照合と手動マッピング
+
+新旧の親で追加された服やボーンなどはFileIDが異なるため、GUIDだけを置き換えるとMissingになる場合があります。本ツールは新旧の親の階層とコンポーネントからFileIDの変換表を作成し、GUIDと同時に参照先FileIDを修正します。
+
+階層パス一致に加え、Humanoidボーン一致・一意なGameObject名一致によるフォールバック照合と、事前解析結果からの手動マッピングを利用できます。
 
 > [!WARNING]
-> 自動照合（およびフォールバック照合）でも同一オブジェクトとして判定できず、手動マッピングも行われなかった箇所は変換表から漏れてしまいます。その箇所は従来通り `Missing` になりますので、差し替え後に手動で再設定を行ってください。
+> 自動照合・手動マッピングでも対応付けできなかった参照はMissingになる可能性があります。差し替え後に確認し、必要な参照を手動で再設定してください。
 
-### 2. 外部ツールからの参照切れ（仕様）
-置換の際、Unityの仕様により対象Prefabの内部ID（FileID）が振り直されるため、従来はシーンに配置済みのオブジェクトや他アセット・外部ツールからの参照が外れる（Noneになる等）問題がありました。
+### シーン・他アセットからの外部参照修復
 
-現在では、**置換前後の対象PrefabのローカルFileIDを追跡して、シーン（`.unity`）や他アセット（`.prefab` / `.asset` / `.controller` 等）からの参照切れを自動修復する機能**に対応しています。あわせて、書き換え前に `.bak` バックアップを作成するオプションも備えています。
+親差し替え後の再インポートで対象PrefabのローカルFileIDが変わると、シーンや他アセットからの参照が外れることがあります。外部参照修復を有効にすると、変更前後のFileIDを追跡し、Assets内の `.unity`、`.prefab`、`.asset`、`.controller` などの参照を書き換えます。
 
-> [!WARNING]
-> **自動修復の制約事項**
-> * Project Settings の **Asset Serialization Mode** が **`Force Text`** である必要があります。
-> * バイナリ形式や独自フォーマット（JSON等）で参照を保持する外部ツールは自動修復の対象外となります。
-> * 構造変更により新旧で対応付けできない要素は自動修復の対象外となります。
+- **Force Text** のテキストアセットが対象です。
+- バイナリ形式やJSONなどの独自形式で保存された参照は修復対象外です。
+- 構造変更により対応付けできない要素は修復対象外です。
+- `.bak` 作成を有効にした場合は、書き換えるPrefab・参照元ファイルの隣にバックアップを作成します。プロジェクト全体のバックアップも別途用意してください。
 
-### 3. 対象外Prefabの安全なスキップ機能
-対象Prefabのリストに、異なる親から作られた大量のPrefabをごちゃまぜに入れた状態でツールを実行しても問題ありません。
-ツールは**「指定された『旧Variant Parent』のGUIDがファイル内に存在するか」を厳密にチェック**します。一致しないPrefabは安全にスキップされ、警告メッセージを出力して次のファイルへ進むため、誤って意図しないファイルが破壊されることはありません。
+### 対象外Prefabのスキップ
+
+指定した旧Variant ParentのGUIDがファイル内に存在しないPrefabは、警告を出してスキップします。事前解析の結果と実行後のログを確認してください。
+
+## 更新・サポート方針
+
+VCC／ALCOMで導入した場合は、同じプロジェクトの管理画面から本パッケージのバージョンを更新してください。更新内容は[CHANGELOG](Packages/dev.honomin.prefab-variant-parent-replacer/CHANGELOG.md)、配布物は[Releases](https://github.com/honomin3/PrefabVariantParentReplacer/releases)で確認できます。
+
+個別環境での調査・修正・機能追加・使い方のサポートは行いません。冒頭の免責事項を確認のうえ、ご自身の責任で利用・改造してください。
+
+## ライセンス
+
+[MIT License](Packages/dev.honomin.prefab-variant-parent-replacer/LICENSE)。Unity・VRChat・VCC・ALCOMの公式製品ではありません。

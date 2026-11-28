@@ -1,0 +1,53 @@
+name: Build packages
+
+on:
+  push:
+    branches: [master]
+    tags: ['prefab-variant-parent-replacer-v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build VPM and UPM archives
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            python3 scripts/build_package.py --tag "$GITHUB_REF_NAME"
+          else
+            python3 scripts/build_package.py
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: prefab-variant-parent-replacer-packages
+          path: dist/*
+          if-no-files-found: error
+
+  release:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/prefab-variant-parent-replacer-v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: prefab-variant-parent-replacer-packages
+          path: dist
+      - name: Publish release files
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/publish_release.py --tag "$GITHUB_REF_NAME" --target "$GITHUB_SHA" --repository "$GITHUB_REPOSITORY"
