@@ -25,7 +25,7 @@ GitHub ActionsもPR・master更新・手動実行・配布タグのpushで同じ
 
 ## 公開と共通VPM一覧への登録
 
-1. 公開するソースのコミットに上記のタグを付け、GitHub Releaseを作成します。生成したZIP・TGZ・`SHA256SUMS` を同じReleaseへ添付します。`vpm-package.json` は登録作業用です。
+1. `docs/RELEASE_NOTES_JA.md` を公開するバージョンの内容と検証結果へ更新し、公開するソースのコミットに上記のタグを付けてpushします。GitHub Actionsがパッケージを生成・検証し、ZIP・TGZ・`SHA256SUMS`・リリースノートを添付してGitHub Releaseを公開します。既存の下書きは更新できますが、公開済みの同じバージョンは上書きしません。`vpm-package.json` は登録作業用です。
 2. `vpm-package.json` の `url` から公開済みZIPを取得できることと、取得したZIPのSHA-256が `zipSHA256` に一致することを確認します。ビルドし直した場合は、必ず実際に公開したファイルのハッシュを使用します。
 3. `honomin3/Packages` の既存の `index.json` を開き、`packages["dev.honomin.prefab-variant-parent-replacer"].versions["<version>"]` に `vpm-package.json` のオブジェクトを追加します。既存のArmature Scale Syncや過去版、一覧の名前・ID・URLは保持します。共通一覧全体を `vpm-package.json` で置き換えないでください。
 4. 初回公開時は、共通一覧のREADMEにも本リポジトリへのリンクを追加します。
